@@ -1,0 +1,31 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>spark-rabbitmq-streaming</title>
+</head>
+<body>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="http://dimplejs.org/dist/dimple.v2.1.6.min.js"></script>
+    <script>
+        var draw = function(data) {
+            d3.select("#chartContainer").remove();
+            d3.select("body").append("div").attr("id", "chartContainer");
+            var svg = dimple.newSvg("#chartContainer", 590, 400);
+            var myChart = new dimple.chart(svg, data[0]);
+            myChart.setBounds(60, 30, 510, 305)
+            var x = myChart.addCategoryAxis("x", "did");
+            x.addOrderRule("count");
+            myChart.addMeasureAxis("y", "count");
+            myChart.addSeries(['did'], dimple.plot.bar);
+            myChart.draw();
+        };
+        var eventSource = new EventSource('//localhost:5050/ws');
+        eventSource.addEventListener('AdViewCount', function(e) {
+            var event = JSON.parse(e.data);
+            draw(event);
+        }, false);
+    </script>
+</body>
+</html>
+
